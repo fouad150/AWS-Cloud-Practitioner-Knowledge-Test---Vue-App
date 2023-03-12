@@ -2,22 +2,31 @@
 import { ref, computed } from 'vue'
 const questions=ref([
 
-        {question: 'What is Vue JS?',
-            answer: 0,
-            options: [
-                'A front end framework',
-                'A library',
-                'An ice cream maker'
-            ],
-            selected: null
-        },
-        {question: 'what is blabla',
+        {question: "Why is AWS more economical than traditional data centers for applications with varying compute workloads?",
             answer: 2,
             options: [
-                'bla',
-                'blabla',
-                'blablabla'
+              "Amazon EC2 costs are billed on a monthly basis.",
+              "Users retain full administrative access to their Amazon EC2 instances.",
+              "Amazon EC2 instances can be launched on demand when needed.",
+              "Users can permanently run enough instances to handle peak workloads."
             ],
+            description:`The ability to launch instances on demand when needed allows users to launch and terminate instances in
+              response to a varying workload. This is a more economical practice than purchasing enough on-premises servers
+              to handle the peak load.`,
+            selected: null
+        },
+        {question: "Which AWS service would simplify the migration of a database to AWS?",
+            answer: 1,
+            options: [
+              "AWS Storage Gateway",
+              "AWS Database Migration Service (AWS DMS)",
+              "Amazon EC2",
+              "Amazon AppStream 2.0"
+            ],
+            description:`AWS DMS helps users migrate databases to AWS quickly and securely. The source database remains
+              fully operational during the migration, minimizing downtime to applications that rely on the database. AWS DMS
+              can migrate data to and from most widely used commercial and open-source databases.
+              `,
             selected: null
         },
     ])
@@ -31,6 +40,11 @@ const questions=ref([
 //       $x.value=8;
 //     }
 
+    const chosenAnswers=[];
+    const rightAnswers=[];
+    function setResult(){
+      
+    }
 
     const quizCompleted = ref(false)
 
@@ -56,10 +70,19 @@ const questions=ref([
     //   console.log(question.x);
       return question
     })
-
+    
     const SetAnswer = evt => {
       questions.value [currentQuestion.value].selected = evt.target.value
       evt.target.value = null
+
+      // if(getCurrentQuestion.selected!=getCurrentQuestion.answer){
+      //     chosenAnswers.push(getCurrentQuestion.selected);
+      //     rightAnswers.push([getCurrentQuestion.answer,getCurrentQuestion.description]);
+      //     console.log(chosenAnswers);
+      //     console.log(rightAnswers);
+      // }
+      console.log(getCurrentQuestion.value.answer);
+      console.log(questions.value[0].answer);
     }
 
     const NextQuestion = () => {
@@ -89,9 +112,9 @@ const questions=ref([
                   :key="index"
                   :class="`option ${
                         getCurrentQuestion.selected == index
-                        ? index == getCurrentQuestion.answer
-                        ? 'correct'
-                        : 'wrong'
+                           ? index == getCurrentQuestion.answer
+                              ? 'correct'
+                              : 'wrong'
                         : ''
                   } ${
                         getCurrentQuestion.selected != null &&
