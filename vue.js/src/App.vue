@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-const questions=ref([
+const questions_array=[
 
         {question: "Why is AWS more economical than traditional data centers for applications with varying compute workloads?",
             answer: 2,
@@ -29,27 +29,63 @@ const questions=ref([
               `,
             selected: null
         },
-    ])
+        {question:"Which AWS offering enables users to find, buy, and immediately start using software solutions in their AWS environment?",
+            answer: 2,
+            options: [
+              "AWS Config",
+              "AWS OpsWorks",
+              "AWS SDK",
+              "AWS Marketplace"
+            ],
+            description:`AWS Marketplace is a digital catalog with thousands of software listings from independent software
+              vendors that makes it easy to find, test, buy, and deploy software that runs on AWS.`,
+            selected: null
+        },
+        {question:"Which AWS networking service enables a company to create a virtual network within AWS?",
+            answer: 2,
+            options: [
+              "AWS Config",
+              "Amazon Route 53",
+              "AWS Direct Connect",
+              "Amazon Virtual Private Cloud (Amazon VPC)"
+            ],
+            description:`Amazon VPC lets users provision a logically isolated section of the AWS Cloud where users can launch
+              AWS resources in a virtual network that they define.`,
+            selected: null
+        },
+        {question: "Which AWS service would simplify the migration of a database to AWS?",
+            answer: 1,
+            options: [
+              "AWS Storage Gateway",
+              "AWS Database Migration Service (AWS DMS)",
+              "Amazon EC2",
+              "Amazon AppStream 2.0"
+            ],
+            description:`AWS DMS helps users migrate databases to AWS quickly and securely. The source database remains
+              fully operational during the migration, minimizing downtime to applications that rely on the database. AWS DMS
+              can migrate data to and from most widely used commercial and open-source databases.
+              `,
+            selected: null
+        },
+    ];
+
+const questions=ref(questions_array.sort((a, b) => 0.5 - Math.random()))
   
-//    const $x=ref(4);
+//    const x=ref(4);
    
-//    const $y=computed(()=>{
-//     return $x;
+//    const y=computed(()=>{
+//     return x;
 //    });
 //    const changeX =()=>{
-//       $x.value=8;
+//       x.value=8;
 //     }
 
-    const chosenAnswers=[];
+    const wrongAnswers=[];
     const rightAnswers=[];
-    function setResult(){
-      
-    }
 
     const quizCompleted = ref(false)
 
     const currentQuestion = ref (0)
-    // alert(currentQuestion.value);
 
     // console.log(questions.value[1].question);
     const score = computed (() => {
@@ -61,7 +97,6 @@ const questions=ref([
       })
       return value
     })  
-    // console.log(score); 
 
     const getCurrentQuestion = computed (() => {
       let question = questions.value [currentQuestion.value]
@@ -75,14 +110,11 @@ const questions=ref([
       questions.value [currentQuestion.value].selected = evt.target.value
       evt.target.value = null
 
-      // if(getCurrentQuestion.selected!=getCurrentQuestion.answer){
-      //     chosenAnswers.push(getCurrentQuestion.selected);
-      //     rightAnswers.push([getCurrentQuestion.answer,getCurrentQuestion.description]);
-      //     console.log(chosenAnswers);
-      //     console.log(rightAnswers);
-      // }
-      console.log(getCurrentQuestion.value.answer);
-      console.log(questions.value[0].answer);
+      if(getCurrentQuestion.value.selected!=getCurrentQuestion.value.answer){
+          wrongAnswers.push([getCurrentQuestion.value.selected,currentQuestion.value]);
+      }
+      // console.log(getCurrentQuestion.value.answer);
+      // console.log(questions.value[0].answer);
     }
 
     const NextQuestion = () => {
@@ -101,6 +133,11 @@ const questions=ref([
   <body>
     <main class="app">
       <h1>The Quiz</h1>
+      <div class="stepper">
+        <div class="circle active">1</div>
+        <div class="circle active">2</div>
+        <div :class="`circle ${quizCompleted == true?'active':''}`">3</div>
+      </div>
       <section class="quiz" v-if="!quizCompleted">
           <div class="quiz-info">
               <span class="question">{{ getCurrentQuestion.question }}</span>
@@ -144,11 +181,23 @@ const questions=ref([
                           : 'Next Question'
               }}
           </button>
+
+          <div class="progressBar">
+            <span v-for="(question,index) in questions" :class="` ${currentQuestion>=index?'enabled':''}`">{{index+1}}</span>
+          </div>
       </section>
 
       <section v-else>
         <h2>You have finished the quiz!</h2>
         <p>Your score is {{ score }} / {{ questions.length}}</p>
+        <div class="result">
+          <div v-for="(wrongAnswer,index) in wrongAnswers" key="index">
+            <p><span class="wrong-answer">you chose:</span> {{questions[wrongAnswer[1]].options[wrongAnswer[0]]}}</p>
+            <p><span class="right-answer">corret answer: </span>{{questions[wrongAnswer[1]].options[questions[wrongAnswer[1]].answer]}}</p>
+            <p><span class="description">description:</span> {{questions[wrongAnswer[1]].description}}</p>
+         </div>
+        </div>
+        
         </section>
   </main>
   </body>
@@ -183,6 +232,31 @@ body{
 h1{
   font-size: 2rem;
   margin-bottom: 2rem;
+}
+
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 280px;
+  margin: 0px 0px 20px 0px;
+}
+
+.circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ddd;
+  color: #333;
+  font-size: 20px;
+}
+
+.circle.active {  
+  background-color: #2cce7d;
+  color: #fff;
 }
 
 .quiz{
@@ -238,7 +312,7 @@ h1{
   margin-bottom:0;
 }
 
-option.disabled{
+input.disabled{
   opacity:0.5;
 }
 
@@ -275,6 +349,41 @@ p{
   color: #8f8f8f;
   font-size: 1.25rem;
   text-align:center;
+}
+
+.progressBar {
+  margin: 14PX 0PX 14PX 22PX;
+}
+.progressBar span {
+  font-weight: bold;
+  font-size: 20px;
+  margin-right: 10px;
+  color: #2cce7d;
+  opacity: 0.5;
+}
+
+.enabled{
+  opacity: 1!important;
+}
+
+.result{
+  margin-top: 30px;
+  width: 770PX
+}
+.result div{
+  padding-top: 20px;
+}
+.result p{
+text-align: start;
+}
+.result p .wrong-answer{
+  color: #f84906;
+}
+.result p .right-answer{
+  color: #2cce7d;
+}
+.result p .description{
+  color:#2cce7d;
 }
 </style>
 
