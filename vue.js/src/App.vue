@@ -81,7 +81,6 @@ const questions=ref(questions_array.sort((a, b) => 0.5 - Math.random()))
 //     }
 
     const wrongAnswers=[];
-    const rightAnswers=[];
 
     const quizCompleted = ref(false)
 
